@@ -64,6 +64,7 @@ tab-size = 4
 #include "btop_config.hpp"
 #include "btop_draw.hpp"
 #include "btop_input.hpp"
+#include "btop_locale.hpp"
 #include "btop_log.hpp"
 #include "btop_menu.hpp"
 #include "btop_shared.hpp"
@@ -667,16 +668,17 @@ namespace Runner {
 				if (empty_bg.empty()) {
 					const int x = Term::width / 2 - 10, y = Term::height / 2 - 10;
 					output += Term::clear;
-					empty_bg = fmt::format(
-						"{banner}"
-						"{mv1}{titleFg}{b}No boxes shown!"
-						"{mv2}{hiFg}1 {mainFg}| Show CPU box"
-						"{mv3}{hiFg}2 {mainFg}| Show MEM box"
-						"{mv4}{hiFg}3 {mainFg}| Show NET box"
-						"{mv5}{hiFg}4 {mainFg}| Show PROC box"
-						"{mv6}{hiFg}5-0 {mainFg}| Show GPU boxes"
-						"{mv7}{hiFg}esc {mainFg}| Show menu"
-						"{mv8}{hiFg}q {mainFg}| Quit",
+					empty_bg = fmt::format(fmt::runtime(
+						std::string("{banner}")
+						+ "{mv1}{titleFg}{b}" + Locale::get("No boxes shown!")
+						+ "{mv2}{hiFg}1 {mainFg}| " + Locale::get("Show CPU box")
+						+ "{mv3}{hiFg}2 {mainFg}| " + Locale::get("Show MEM box")
+						+ "{mv4}{hiFg}3 {mainFg}| " + Locale::get("Show NET box")
+						+ "{mv5}{hiFg}4 {mainFg}| " + Locale::get("Show PROC box")
+						+ "{mv6}{hiFg}5-0 {mainFg}| " + Locale::get("Show GPU boxes")
+						+ "{mv7}{hiFg}esc {mainFg}| " + Locale::get("Show menu")
+						+ "{mv8}{hiFg}q {mainFg}| " + Locale::get("Quit")
+					),
 						"banner"_a = Draw::banner_gen(y, 0, true),
 						"titleFg"_a = Theme::c("title"), "b"_a = Fx::b, "hiFg"_a = Theme::c("hi_fg"), "mainFg"_a = Theme::c("main_fg"),
 						"mv1"_a = Mv::to(y+6, x),
@@ -934,6 +936,9 @@ static auto configure_tty_mode(std::optional<bool> force_tty) {
 
 	//? Config init
 	init_config(cli.low_color, cli.filter);
+
+	//? Initialize locale for i18n support
+	Locale::init(Config::getS("lang"));
 
 	//? Try to find and set a UTF-8 locale
 	if (std::setlocale(LC_ALL, "") != nullptr and not std::string_view { std::setlocale(LC_ALL, "") }.contains(";")

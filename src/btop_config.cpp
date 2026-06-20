@@ -84,6 +84,8 @@ namespace Config {
 
 		{"terminal_sync", 		"#* Use terminal synchronized output sequences to reduce flickering on supported terminals."},
 
+		{"lang", 			"#* Language for btop UI, \"en\" for English, \"zh\" for Chinese."},
+
 		{"graph_symbol", 		"#* Default symbols to use for graph creation, \"braille\", \"block\" or \"tty\".\n"
 								"#* \"braille\" offers the highest resolution but might not be included in all fonts.\n"
 								"#* \"block\" has half the resolution of braille but uses more common characters.\n"
@@ -256,6 +258,7 @@ namespace Config {
 		{"color_theme", "Default"},
 		{"shown_boxes", "cpu mem net proc"},
 		{"graph_symbol", "braille"},
+		{"lang", "en"},
 		{"disable_presets", "Off"},
 		{"presets", "cpu:1:default,proc:0:default cpu:0:default,mem:0:default,net:0:default cpu:0:block,net:0:tty"},
 		{"graph_symbol_cpu", "default"},

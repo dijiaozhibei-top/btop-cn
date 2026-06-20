@@ -20,6 +20,7 @@ tab-size = 4
 
 #include "btop_config.hpp"
 #include "btop_draw.hpp"
+#include "btop_locale.hpp"
 #include "btop_log.hpp"
 #include "btop_shared.hpp"
 #include "btop_theme.hpp"
@@ -1015,8 +1016,8 @@ namespace Menu {
 		if (redraw) {
 			x = Term::width/2 - 40;
 			y = Term::height/2 - 9;
-			bg = Draw::createBox(x + 2, y, 78, 19, Theme::c("hi_fg"), true, "signals");
-			bg += Mv::to(y+2, x+3) + Theme::c("title") + Fx::b + cjust("Send signal to PID " + to_string(s_pid.value()) + " ("
+			bg = Draw::createBox(x + 2, y, 78, 19, Theme::c("hi_fg"), true, Locale::get("signals"));
+			bg += Mv::to(y+2, x+3) + Theme::c("title") + Fx::b + cjust(Locale::get("Send signal to PID ") + to_string(s_pid.value()) + " ("
 				+ uresize((s_pid == Config::getI("detailed_pid") ? Proc::detailed.entry.name : Config::getS("selected_name")), 30) + ")", 76);
 		}
 		else if (is_in(key, "escape", "q")) {
@@ -1082,7 +1083,7 @@ namespace Menu {
 		if (retval == Changed) {
 			int cy = y+4, cx = x+4;
 			out = bg + Mv::to(cy++, x+3) + Theme::c("main_fg") + Fx::ub
-				+ rjust("Enter signal number: ", 48) + Theme::c("hi_fg") + (selected_signal >= 0 ? to_string(selected_signal) : "") + Theme::c("main_fg") + Fx::bl + "█" + Fx::ubl;
+				+ rjust(Locale::get("Enter signal number: "), 48, true) + Theme::c("hi_fg") + (selected_signal >= 0 ? to_string(selected_signal) : "") + Theme::c("main_fg") + Fx::bl + "█" + Fx::ubl;
 
 			auto sig_str = to_string(selected_signal);
 			for (int count = 0, i = 0; const auto& sig : P_Signals) {
@@ -1097,11 +1098,11 @@ namespace Menu {
 			}
 
 			cy++;
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust( "↑ ↓ ← →", 33, true) + Theme::c("main_fg") + Fx::ub + " | To choose signal.";
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("0-9", 33) + Theme::c("main_fg") + Fx::ub + " | Enter manually.";
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("ENTER", 33) + Theme::c("main_fg") + Fx::ub + " | To send signal.";
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust( "↑ ↓ ← →", 33, true) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("To choose signal.");
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("0-9", 33) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("Enter manually.");
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("ENTER", 33) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("To send signal.");
 			mouse_mappings["enter"] = {cy, x, 1, 73};
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("ESC or \"q\"", 33) + Theme::c("main_fg") + Fx::ub + " | To abort.";
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("ESC or \"q\"", 33) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("To abort.");
 			mouse_mappings["escape"] = {cy, x, 1, 73};
 
 			out += Fx::reset;
@@ -1117,11 +1118,11 @@ namespace Menu {
 	static int sizeError(const string& key) {
 		if (redraw) {
 			vector<string> cont_vec {
-				Fx::b + Theme::g("used")[100] + "Error:" + Theme::c("main_fg") + Fx::ub,
-				"Terminal size too small to" + Fx::reset,
-				"display menu or box!" + Fx::reset };
+				Fx::b + Theme::g("used")[100] + Locale::get("Error:") + Theme::c("main_fg") + Fx::ub,
+				Locale::get("Terminal size too small to") + Fx::reset,
+				Locale::get("display menu or box!") + Fx::reset };
 
-			messageBox = Menu::msgBox{45, 0, cont_vec, "error"};
+			messageBox = Menu::msgBox{45, 0, cont_vec, Locale::get("error")};
 			Global::overlay = messageBox();
 		}
 
@@ -1147,13 +1148,13 @@ namespace Menu {
 			atomic_wait(Runner::active);
 			auto& p_name = (s_pid == Config::getI("detailed_pid") ? Proc::detailed.entry.name : Config::getS("selected_name"));
 			vector<string> cont_vec = {
-				Fx::b + Theme::c("main_fg") + "Send signal: " + Fx::ub + Theme::c("hi_fg") + to_string(signalToSend)
+				Fx::b + Theme::c("main_fg") + Locale::get("Send signal: ") + Fx::ub + Theme::c("hi_fg") + to_string(signalToSend)
 				+ (signalToSend > 0 and signalToSend <= 32 ? Theme::c("main_fg") + " (" + P_Signals.at(signalToSend) + ')' : ""),
 
-				Fx::b + Theme::c("main_fg") + "To PID: " + Fx::ub + Theme::c("hi_fg") + to_string(s_pid.value()) + Theme::c("main_fg") + " ("
+				Fx::b + Theme::c("main_fg") + Locale::get("To PID: ") + Fx::ub + Theme::c("hi_fg") + to_string(s_pid.value()) + Theme::c("main_fg") + " ("
 				+ uresize(p_name, 16) + ')' + Fx::reset,
 			};
-			messageBox = Menu::msgBox{50, 1, cont_vec, (signalToSend > 1 and signalToSend <= 32 and signalToSend != 17 ? P_Signals.at(signalToSend) : "signal")};
+			messageBox = Menu::msgBox{50, 1, cont_vec, (signalToSend > 1 and signalToSend <= 32 and signalToSend != 17 ? P_Signals.at(signalToSend) : Locale::get("signal"))};
 			Global::overlay = messageBox();
 		}
 		auto ret = messageBox.input(key);
@@ -1187,21 +1188,21 @@ namespace Menu {
 	static int signalReturn(const string& key) {
 		if (redraw) {
 			vector<string> cont_vec;
-			cont_vec.push_back(Fx::b + Theme::g("used")[100] + "Failure:" + Theme::c("main_fg") + Fx::ub);
+			cont_vec.push_back(Fx::b + Theme::g("used")[100] + Locale::get("Failure:") + Theme::c("main_fg") + Fx::ub);
 			if (signalKillRet == EINVAL) {
-				cont_vec.push_back("Unsupported signal!" + Fx::reset);
+				cont_vec.push_back(Locale::get("Unsupported signal!") + Fx::reset);
 			}
 			else if (signalKillRet == EPERM) {
-				cont_vec.push_back("Insufficient permissions to send signal!" + Fx::reset);
+				cont_vec.push_back(Locale::get("Insufficient permissions to send signal!") + Fx::reset);
 			}
 			else if (signalKillRet == ESRCH) {
-				cont_vec.push_back("Process not found!" + Fx::reset);
+				cont_vec.push_back(Locale::get("Process not found!") + Fx::reset);
 			}
 			else {
-				cont_vec.push_back("Unknown error! (errno: " + to_string(signalKillRet) + ')' + Fx::reset);
+				cont_vec.push_back(Locale::get("Unknown error! (errno: ") + to_string(signalKillRet) + ')' + Fx::reset);
 			}
 
-			messageBox = Menu::msgBox{50, 0, cont_vec, "error"};
+			messageBox = Menu::msgBox{50, 0, cont_vec, Locale::get("error")};
 			Global::overlay = messageBox();
 		}
 
@@ -1288,6 +1289,12 @@ namespace Menu {
 				for (int ic = 0; const auto& line : menu) {
 					out += Mv::to(cy++, Term::width/2 - menu_width[i]/2) + (tty_mode ? "" : colors[ic++]) + line;
 				}
+				{
+					static const string menu_labels[] = {Locale::get("Options"), Locale::get("Help"), Locale::get("Quit")};
+					int label_x = Term::width/2 - (int)ulen(menu_labels[i]) / 2;
+					out += Mv::to(cy++, label_x) + Theme::c("title") + menu_labels[i];
+				}
+
 			}
 			out += Fx::reset;
 		}
@@ -1628,8 +1635,8 @@ static int optionsMenu(const string& key) {
 			for (int i = 0; const auto& m : {"general", "cpu", "mem", "net", "proc"}) {
 		#endif
 				out += Fx::b + (i == selected_cat
-						? Theme::c("hi_fg") + '[' + Theme::c("title") + m + Theme::c("hi_fg") + ']'
-						: Theme::c("hi_fg") + to_string(i + 1) + Theme::c("title") + m + ' ')
+						? Theme::c("hi_fg") + '[' + Theme::c("title") + Locale::get(m) + Theme::c("hi_fg") + ']'
+						: Theme::c("hi_fg") + to_string(i + 1) + Theme::c("title") + Locale::get(m) + ' ')
 				#ifdef GPU_SUPPORT
 					+ Mv::r(7);
 				#else
@@ -1685,7 +1692,7 @@ static int optionsMenu(const string& key) {
 				}
 
 				out += Mv::to(cy++, x + 1) + (c-1 == selected ? Theme::c("selected_bg") + Theme::c("selected_fg") : Theme::c("title"))
-					+ Fx::b + cjust(capitalize(s_replace(option, "_", " ")) + idx_str, 29);
+					+ Fx::b + cjust([&]() -> string { auto t = Locale::get(option); return t != option ? t + idx_str : capitalize(s_replace(option, "_", " ")) + idx_str; }(), 29);
 				out	+= Mv::to(cy++, x + 1) + (c-1 == selected ? "" : Theme::c("main_fg")) + Fx::ub + "  "
 					+ (c-1 == selected and editing ? cjust(editor(24), 34, true) : cjust(value, 25, true)) + "  ";
 
@@ -1704,7 +1711,7 @@ static int optionsMenu(const string& key) {
 						if (cyy++ == y+7) continue;
 						else if (cyy == y+10) out += Theme::c("main_fg") + Fx::ub;
 						else if (cyy > y + height + 4) break;
-						out += Mv::to(cyy, x+32) + desc;
+						out += Mv::to(cyy, x+32) + Locale::get(desc);
 					}
 				}
 			}
@@ -1757,7 +1764,7 @@ static int optionsMenu(const string& key) {
 			pages = ceil((double)help_text.size() / (height - 3));
 			page = 0;
 			bg = Draw::banner_gen(y, 0, true);
-			bg += Draw::createBox(x, y + 6, 78, height, Theme::c("hi_fg"), true, "help");
+			bg += Draw::createBox(x, y + 6, 78, height, Theme::c("hi_fg"), true, Locale::get("Help"));
 		}
 		else if (is_in(key, "escape", "q", "h", "backspace", "space", "enter", "mouse_click")) {
 			return Closed;
@@ -1777,14 +1784,14 @@ static int optionsMenu(const string& key) {
 			auto& out = Global::overlay;
 			out = bg;
 			if (pages > 1) {
-				out += Mv::to(y+height+6, x + 2) + Theme::c("hi_fg") + Symbols::title_left_down + Fx::b + Symbols::up + Theme::c("title") + " page "
+				out += Mv::to(y+height+6, x + 2) + Theme::c("hi_fg") + Symbols::title_left_down + Fx::b + Symbols::up + Theme::c("title") + Locale::get(" page ")
 					+ to_string(page+1) + '/' + to_string(pages) + ' ' + Theme::c("hi_fg") + Symbols::down + Fx::ub + Symbols::title_right_down;
 			}
 			auto cy = y+7;
-			out += Mv::to(cy++, x + 1) + Theme::c("title") + Fx::b + cjust("Key:", 20) + "Description:";
+			out += Mv::to(cy++, x + 1) + Theme::c("title") + Fx::b + cjust(Locale::get("Key:"), 20) + Locale::get("Description:");
 			for (int c = 0, i = max(0, (height - 3) * page); c++ < height - 3 and i < (int)help_text.size(); i++) {
 				out += Mv::to(cy++, x + 1) + Theme::c("hi_fg") + Fx::b + cjust(help_text[i][0], 20)
-					+ Theme::c("main_fg") + Fx::ub + help_text[i][1];
+					+ Theme::c("main_fg") + Fx::ub + Locale::get(help_text[i][1]);
 			}
 			out += Fx::reset;
 		}
@@ -1814,8 +1821,8 @@ static int optionsMenu(const string& key) {
 		if (redraw) {
 			x = Term::width/2 - 25;
 			y = Term::height/2 - 6;
-			bg = Draw::createBox(x + 2, y, 50, 13, Theme::c("hi_fg"), true, "renice");
-			bg += Mv::to(y+2, x+3) + Theme::c("title") + Fx::b + cjust("Renice PID " + to_string(s_pid.value()) + " ("
+			bg = Draw::createBox(x + 2, y, 50, 13, Theme::c("hi_fg"), true, Locale::get("renice"));
+			bg += Mv::to(y+2, x+3) + Theme::c("title") + Fx::b + cjust(Locale::get("Renice PID ") + to_string(s_pid.value()) + " ("
 				+ uresize((s_pid == Config::getI("detailed_pid") ? Proc::detailed.entry.name : Config::getS("selected_name")), 15) + ")", 48);
 		}
 		else if (is_in(key, "escape", "q")) {
@@ -1870,14 +1877,14 @@ static int optionsMenu(const string& key) {
 				catch (...) { selected_nice = 0; }
 			}
 			out = bg + Mv::to(cy++, x+3) + Theme::c("main_fg") + Fx::ub
-				+ rjust("Enter nice value: ", 30) + Theme::c("hi_fg") + (nice_edit.empty() ? to_string(selected_nice) : nice_edit) + Theme::c("main_fg") + Fx::bl + "█" + Fx::ubl;
+				+ rjust(Locale::get("Enter nice value: "), 30, true) + Theme::c("hi_fg") + (nice_edit.empty() ? to_string(selected_nice) : nice_edit) + Theme::c("main_fg") + Fx::bl + "█" + Fx::ubl;
 
 			cy++;
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust( "↑ ↓", 20, true) + Theme::c("main_fg") + Fx::ub + " | To change value.";
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust( "← →", 20, true) + Theme::c("main_fg") + Fx::ub + " | To change value by 5.";
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("0-9", 20) + Theme::c("main_fg") + Fx::ub + " | Enter manually.";
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("ENTER", 20) + Theme::c("main_fg") + Fx::ub + " | To set nice value.";
-			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("ESC or 'q'", 20) + Theme::c("main_fg") + Fx::ub + " | To abort.";
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust( "↑ ↓", 20, true) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("To change value.");
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust( "← →", 20, true) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("To change value by 5.");
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("0-9", 20) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("Enter manually.");
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("ENTER", 20) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("To set nice value.");
+			out += Mv::to(++cy, x+3) + Fx::b + Theme::c("hi_fg") + rjust("ESC or 'q'", 20) + Theme::c("main_fg") + Fx::ub + " | " + Locale::get("To abort.");
 
 			out += Fx::reset;
 		}

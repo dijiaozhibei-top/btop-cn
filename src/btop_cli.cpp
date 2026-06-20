@@ -19,6 +19,7 @@
 #include <fmt/format.h>
 
 #include "btop_config.hpp"
+#include "btop_locale.hpp"
 #include "btop_shared.hpp"
 #include "config.h"
 
@@ -35,19 +36,19 @@ static constexpr auto RESET = "\033[0m"sv;
 
 static void version() noexcept {
 	if constexpr (GIT_COMMIT.empty()) {
-		fmt::println("btop version: {}{}{}", BOLD, Global::Version, RESET);
+		fmt::println("{}{}{}", Locale::get("btop version: "), BOLD, Global::Version);
 	} else {
-		fmt::println("btop version: {}{}+{}{}", BOLD, Global::Version, GIT_COMMIT, RESET);
+		fmt::println("{}{}{}+{}", Locale::get("btop version: "), BOLD, Global::Version, GIT_COMMIT);
 	}
 }
 
 static void build_info() noexcept {
-	fmt::println("Compiled with: {} ({})", COMPILER, COMPILER_VERSION);
-	fmt::println("Configured with: {}", CONFIGURE_COMMAND);
+	fmt::println("{}{} ({})", Locale::get("Compiled with: "), COMPILER, COMPILER_VERSION);
+	fmt::println("{}{}", Locale::get("Configured with: "), CONFIGURE_COMMAND);
 }
 
 static void error(std::string_view msg) noexcept {
-	fmt::println("{}error:{} {}\n", BOLD_RED, RESET, msg);
+		fmt::println("{}{}", Locale::get("error: "), msg);
 }
 
 namespace Cli {
@@ -125,7 +126,7 @@ namespace Cli {
 			if (arg == "-f" || arg == "--filter") {
 				// This flag requires an argument.
 				if (++it == args.end()) {
-					error("Filter requires an argument");
+					error(Locale::get("Filter requires an argument"));
 					return std::unexpected { 1 };
 				}
 
@@ -183,10 +184,10 @@ namespace Cli {
 					auto refresh_rate = std::max(std::stoi(arg.data()), 100);
 					cli.updates = refresh_rate;
 				} catch (std::invalid_argument& e) {
-					error("Update must be a positive number");
+					error(Locale::get("Update must be a positive number"));
 					return std::unexpected { 1 };
 				} catch (std::out_of_range& e) {
-					error(fmt::format("Update argument is out of range: {}", arg.data()));
+				error(Locale::get("Update argument is out of range: ") + string(arg.data()));
 					return std::unexpected { 1 };
 				}
 				continue;
@@ -217,7 +218,7 @@ namespace Cli {
 				} else if (!line_view.empty()) {
 					auto pos = line_view.find("=");
 					if (pos == line_view.npos) {
-						error("invalid default config: '=' not found");
+						error(Locale::get("invalid default config: '=' not found"));
 						return std::unexpected { 1 };
 					}
 					auto name = line_view.substr(0, pos);
@@ -243,7 +244,7 @@ namespace Cli {
 	}
 
 	void usage() noexcept {
-		fmt::println("{0}Usage:{1} {2}btop{1} [OPTIONS]\n", BOLD_UNDERLINE, RESET, BOLD);
+		fmt::println("{}{}{} [OPTIONS]\n", BOLD_UNDERLINE, Locale::get("Usage: btop [OPTIONS]"), RESET);
 	}
 
 	void help() noexcept {
@@ -267,6 +268,6 @@ namespace Cli {
 	}
 
 	void help_hint() noexcept {
-		fmt::println("For more information, try '{}--help{}'", BOLD, RESET);
+			fmt::println("{}", Locale::get("For more information, try '--help'"));
 	}
 } // namespace Cli
