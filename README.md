@@ -39,10 +39,10 @@ bash <(curl -sL https://www.dijiaozhibei.top/btop-cn.sh)
 
 ## 📸 截图
 
-![normal](Img/normal.png)
-![main-menu](Img/main-menu.png)
-![options-menu](Img/options-menu.png)
-![help-menu](Img/help-menu.png)
+![normal](Img/normal-中文.png)
+![main-menu](Img/main-menu-中文.png)
+![options-menu](Img/options-menu-中文.png)
+![help-menu](Img/help-menu-中文.png)
 
 ## 🖥️ 使用方法
 
